@@ -1,0 +1,42 @@
+# Base image
+FROM php:8.2-fpm
+
+# Set working directory
+WORKDIR /var/www
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    curl \
+    git \
+    libssl-dev \
+    libzip-dev \
+    libmcrypt-dev
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring bcmath gd zip opcache
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copy application files
+COPY . .
+
+# Set permissions for Laravel storage and cache
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+# Install Laravel dependencies via Composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Expose the application on port 9000
+EXPOSE 9000
+
+# Start PHP-FPM
+CMD ["php-fpm"]

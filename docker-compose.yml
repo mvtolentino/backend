@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: laravel_app
+    volumes:
+      - .:/var/www
+      - ./storage:/var/www/storage
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_HOST=host.docker.internal # Use this to connect to your DBngin database
+      - DB_PORT=3306
+      - DB_DATABASE=project
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+    ports:
+      - "9000:9000"
